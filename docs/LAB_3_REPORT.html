@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lab 3 Report — ContainerPulse OCI Container Engineering &amp; Optimization</title>
+<style>
+  @page { size: A4; margin: 22mm 20mm 22mm 20mm; }
+
+  * { box-sizing: border-box; }
+
+  body {
+    font-family: "Times New Roman", Times, Georgia, serif;
+    font-size: 12pt;
+    line-height: 1.38;
+    color: #111;
+    margin: 0;
+  }
+
+  p { margin: 0 0 10pt 0; text-align: justify; }
+
+  .title-block { text-align: center; margin-bottom: 22pt; }
+  .title-block h1 {
+    font-size: 20pt; margin: 0 0 6pt 0; font-weight: bold;
+  }
+  .title-block .subtitle {
+    font-size: 13.5pt; font-weight: bold; margin: 0 0 14pt 0;
+  }
+  .title-block .meta-line { font-size: 12pt; margin: 2pt 0; }
+  .title-block .meta-line a { color: #111; text-decoration: underline; }
+  .title-block .class-line { font-size: 12pt; margin-top: 8pt; }
+
+  hr.divider { border: none; border-top: 1px solid #999; margin: 16pt 0; }
+
+  h2.section {
+    font-size: 13.5pt; font-weight: bold; margin: 20pt 0 8pt 0;
+    break-after: avoid;
+  }
+  h3.subsection {
+    font-size: 12pt; font-weight: bold; margin: 12pt 0 6pt 0;
+    break-after: avoid;
+  }
+
+  ul, ol { margin: 6pt 0 12pt 0; padding-left: 22pt; }
+  li { text-align: justify; margin-bottom: 5pt; }
+  li strong.lead { font-weight: bold; }
+
+  figure {
+    margin: 14pt 0; text-align: center; break-inside: avoid;
+  }
+  figure img {
+    max-width: 100%; border: 1px solid #bbb; border-radius: 2px;
+  }
+  figcaption {
+    font-style: italic; font-size: 10.5pt; margin-top: 6pt; color: #222;
+    text-align: center;
+  }
+
+  pre.code {
+    background: #f6f6f4; border: 1px solid #ddd; border-radius: 2px;
+    font-family: Consolas, "Courier New", monospace; font-size: 9.5pt;
+    line-height: 1.35; padding: 9pt 11pt; margin: 8pt 0 12pt 0;
+    white-space: pre-wrap; word-wrap: break-word; text-align: left;
+    break-inside: avoid;
+  }
+
+  table {
+    width: 100%; border-collapse: collapse; margin: 10pt 0 14pt 0;
+    font-size: 10.5pt; break-inside: avoid;
+  }
+  th, td {
+    border: 1px solid #999; padding: 5pt 7pt; text-align: left; vertical-align: top;
+  }
+  th { background: #eeeeee; font-weight: bold; text-align: center; }
+
+  strong { font-weight: bold; }
+  code.inline { font-family: Consolas, "Courier New", monospace; font-size: 10.5pt; }
+</style>
+</head>
+<body>
+
+<div class="title-block">
+  <h1>Lab Report</h1>
+  <div class="subtitle">OCI Container Image Engineering, Multi-Stage Optimization, Tagging &amp; Vulnerability Scanning<br>ContainerPulse — Cloud-Native Container Telemetry &amp; Quality Watchdog</div>
+  <div class="meta-line">Achindra Sharma — 2547105 (Individual Submission)</div>
+  <div class="meta-line class-line">4MCA A — MCA Trimester 5: DevOps Lab (Lab 3)</div>
+  <div class="meta-line" style="margin-top:10pt;">Repository: <a href="https://github.com/Achindra2003/devops-lab3-oci-containers">github.com/Achindra2003/devops-lab3-oci-containers</a></div>
+</div>
+
+<h2 class="section">1. Project Description &amp; System Context</h2>
+<p>When engineering containerized microservices for cloud-native deployment, naive Dockerfiles often bundle full operating system toolchains, run processes with root privileges, and inflate image sizes beyond 1 GB. The objective of this lab is to <strong>build, optimize, tag and push OCI-compliant container images using Docker or Podman and scan images for vulnerabilities</strong>.</p>
+<p>Rather than packaging an unmonitored hello-world script, we designed and implemented <strong>ContainerPulse</strong>, a cloud-native container telemetry microservice and security monitoring portal. The application exposes health probes (<code class="inline">/healthz</code>, <code class="inline">/livez</code>), provides container runtime inspection (<code class="inline">/api/container-info</code>), and renders an interactive dashboard demonstrating optimization metrics, OCI annotations, and vulnerability scan logs.</p>
+
+<figure>
+  <img src="screenshots/10-containerpulse-live-dashboard.png" alt="ContainerPulse Live Browser Dashboard">
+  <figcaption>Figure 1 — ContainerPulse interactive dashboard showing runtime metrics, non-root user context, and 87.3% size reduction.</figcaption>
+</figure>
+
+<h2 class="section">2. Container Optimization: Baseline vs. Multi-Stage Architecture</h2>
+<p>To establish empirical proof of optimization, we created two contrasting Dockerfile implementations:</p>
+<ul>
+  <li><strong class="lead">Baseline Anti-Pattern (<code class="inline">Dockerfile.unoptimized</code>)</strong> — single-stage build based on Debian <code class="inline">node:22</code>. Runs as root (UID 0), lacks context filtering, retains package manager cache bloat, and weighs <strong>1,120 MB (1.12 GB)</strong>.</li>
+  <li><strong class="lead">Optimized Production OCI Image (<code class="inline">Dockerfile</code>)</strong> — two-stage build based on minimal <code class="inline">node:22-alpine</code>. Employs build-time dependency pruning, enforces non-root execution (<code class="inline">USER node</code>, UID 1000), embeds OCI annotations, and registers native <code class="inline">HEALTHCHECK</code> probes. Weighs only <strong>142 MB</strong>.</li>
+</ul>
+
+<figure>
+  <img src="screenshots/01-docker-build-unoptimized.png" alt="Docker Build Unoptimized Baseline">
+  <figcaption>Figure 2 — Compiling the unoptimized baseline container image using full Debian-based node:22.</figcaption>
+</figure>
+
+<figure>
+  <img src="screenshots/02-docker-build-multistage.png" alt="Docker Build Multi-Stage OCI Image">
+  <figcaption>Figure 3 — Compiling the optimized multi-stage OCI image on Alpine Linux with layer caching.</figcaption>
+</figure>
+
+<figure>
+  <img src="screenshots/03-docker-images-comparison.png" alt="Docker Images Size Benchmark Comparison">
+  <figcaption>Figure 4 — Empirical image size comparison confirming an 87.3% reduction (1.12 GB down to 142 MB).</figcaption>
+</figure>
+
+<h2 class="section">3. Security Hardening &amp; Non-Root Execution</h2>
+<p>Defaulting to root execution within containers creates severe privilege escalation risks. In our production Dockerfile, we configured directory permissions and switched to <code class="inline">USER node</code> (UID 1000: GID 1000). We verified this security control by inspecting the running container:</p>
+<pre class="code">$ docker exec containerpulse-app whoami
+node
+$ docker exec containerpulse-app id
+uid=1000(node) gid=1000(node) groups=1000(node)
+$ docker exec containerpulse-app touch /etc/test.txt
+touch: /etc/test.txt: Permission denied</pre>
+
+<figure>
+  <img src="screenshots/04-docker-run-nonroot.png" alt="Non-Root Least-Privilege Execution Verification">
+  <figcaption>Figure 5 — Verifying non-root execution (UID 1000) and write-protection on system directories.</figcaption>
+</figure>
+
+<figure>
+  <img src="screenshots/05-docker-healthcheck-status.png" alt="Docker HEALTHCHECK Status">
+  <figcaption>Figure 6 — Docker inspect verifying native container HEALTHCHECK status (healthy).</figcaption>
+</figure>
+
+<h2 class="section">4. Semantic Tagging &amp; Registry Distribution Strategy</h2>
+<p>Container images are tagged using standardized Open Container Initiative (OCI) semantics across dual registries (Docker Hub and GitHub Container Registry):</p>
+<ul>
+  <li><strong class="lead">Semantic Versioning</strong>: <code class="inline">containerpulse:1.0.0</code> and <code class="inline">containerpulse:1.0</code> for immutable production deployments.</li>
+  <li><strong class="lead">Git SHA Tagging</strong>: <code class="inline">containerpulse:sha-4742b34</code> for source-level build provenance.</li>
+  <li><strong class="lead">Latest Tag</strong>: <code class="inline">containerpulse:latest</code> for continuous trunk integration.</li>
+</ul>
+
+<figure>
+  <img src="screenshots/06-docker-tagging-strategy.png" alt="OCI Semantic Tagging Strategy in Terminal">
+  <figcaption>Figure 7 — Standardized semantic tags referencing identical content-addressable image digests.</figcaption>
+</figure>
+
+<figure>
+  <img src="screenshots/07-docker-push-registry.png" alt="Pushing Image Layers to Container Registry">
+  <figcaption>Figure 8 — Pushing OCI image layers and SHA-256 manifest to GitHub Container Registry (GHCR).</figcaption>
+</figure>
+
+<h2 class="section">5. Vulnerability Scanning with Trivy &amp; Docker Scout</h2>
+<p>Auditing both images with <strong>Aqua Security Trivy</strong> revealed that our optimization reduced vulnerabilities by 98.8%:</p>
+<table>
+  <thead>
+    <tr>
+      <th>Image Target</th>
+      <th>Base OS</th>
+      <th>Installed Packages</th>
+      <th>CRITICAL</th>
+      <th>HIGH</th>
+      <th>MEDIUM</th>
+      <th>LOW</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="inline">containerpulse:unoptimized</code></td>
+      <td>Debian 12 (Bookworm)</td>
+      <td>348 packages</td>
+      <td style="color:#ef4444;font-weight:bold;text-align:center;">4</td>
+      <td style="color:#f59e0b;font-weight:bold;text-align:center;">18</td>
+      <td style="text-align:center;">42</td>
+      <td style="text-align:center;">112</td>
+    </tr>
+    <tr>
+      <td><code class="inline">containerpulse:1.0.0</code></td>
+      <td>Alpine Linux 3.21</td>
+      <td>17 packages</td>
+      <td style="color:#10b981;font-weight:bold;text-align:center;">0</td>
+      <td style="color:#10b981;font-weight:bold;text-align:center;">0</td>
+      <td style="text-align:center;">0</td>
+      <td style="text-align:center;">2</td>
+    </tr>
+  </tbody>
+</table>
+
+<figure>
+  <img src="screenshots/08-trivy-vulnerability-scan.png" alt="Aqua Security Trivy Vulnerability Scan">
+  <figcaption>Figure 9 — Trivy vulnerability scan confirming 0 Critical and 0 High CVEs on the hardened Alpine image.</figcaption>
+</figure>
+
+<figure>
+  <img src="screenshots/09-docker-scout-analysis.png" alt="Docker Scout Policy Evaluation">
+  <figcaption>Figure 10 — Docker Scout report confirming 4/4 container security policies passed.</figcaption>
+</figure>
+
+<h2 class="section">6. Beyond the Baseline: Self-Learning Initiatives</h2>
+<p>We implemented seven production container engineering initiatives:</p>
+<ol>
+  <li><strong class="lead">Multi-Stage Build Layer Minimization</strong> — decreased image size by 87.3% (1,120 MB down to 142 MB), reducing cloud rollout bandwidth.</li>
+  <li><strong class="lead">Non-Root Least-Privilege Hardening</strong> — enforced <code class="inline">USER node:node</code> (UID 1000) satisfying CIS Docker Benchmark 4.1.</li>
+  <li><strong class="lead">Open Container Initiative (OCI) v1.0.0 Spec Labels</strong> — standardized metadata annotations embedded in image manifests.</li>
+  <li><strong class="lead">Automated CI/CD Container Build, Scan &amp; Push Pipeline</strong> — GitHub Actions workflow (<code class="inline">.github/workflows/container-ci.yml</code>) scanning with Trivy and pushing to GHCR.</li>
+  <li><strong class="lead">CycloneDX Software Bill of Materials (SBOM)</strong> — automated SBOM generation cataloging transitive dependencies for zero-trust supply chain compliance.</li>
+  <li><strong class="lead">Multi-Architecture Buildx Compilation</strong> — built multi-arch manifests supporting both <code class="inline">linux/amd64</code> and <code class="inline">linux/arm64</code>.</li>
+  <li><strong class="lead">Container Liveness &amp; Readiness Telemetry</strong> — integrated <code class="inline">/healthz</code> and <code class="inline">/livez</code> probes wired into Docker and Kubernetes self-healing.</li>
+</ol>
+
+<h2 class="section">7. Key Learnings &amp; Engineering Reflections</h2>
+<p>1. <strong>Footprint Dictates Attack Surface:</strong> Switching from Debian to Alpine eliminated 331 unneeded system packages, eradicating 100% of Critical and High CVEs without manual patching.</p>
+<p>2. <strong>Multi-Stage Builds are Mandatory:</strong> Without multi-stage builds, compilers, headers, and package caches inevitably leak into production images, ballooning network transfer costs.</p>
+<p>3. <strong>Security by Default:</strong> Containers should never execute as root. Enforcing unprivileged execution (<code class="inline">USER node</code>) ensures defense-in-depth against container breakout exploits.</p>
+<p>4. <strong>Automated Scanning Prevents Regressions:</strong> Integrating Trivy and Docker Scout directly into GitHub Actions guarantees that no newly disclosed CVE can enter the production container registry.</p>
+
+</body>
+</html>
