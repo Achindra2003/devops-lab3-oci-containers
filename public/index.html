@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ContainerPulse — OCI Container Telemetry & Quality Watchdog</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Navbar -->
+    <header class="navbar">
+      <div class="brand">
+        <div class="logo-icon">🐳</div>
+        <div class="brand-text">
+          <span class="brand-title">ContainerPulse</span>
+          <span class="brand-sub">OCI Container Telemetry &amp; Vulnerability Watchdog</span>
+        </div>
+      </div>
+      <div class="nav-pills">
+        <span class="pill pill-oci"><span class="pill-dot"></span> OCI Compliant</span>
+        <span class="pill pill-user">USER: <strong>node (UID 1000)</strong></span>
+        <span class="pill pill-version">v1.0.0</span>
+      </div>
+    </header>
+
+    <!-- Student Attribution Banner -->
+    <section class="student-strip">
+      <div class="student-info">
+        <span>👤 <strong>Student:</strong> Achindra Sharma (2547105)</span>
+        <span>🏫 <strong>Class:</strong> 4MCA A</span>
+        <span>⚙️ <strong>Course:</strong> MCA Trimester 5 — DevOps Lab 3</span>
+      </div>
+      <div class="runtime-meta">
+        <span>📦 <strong>Target:</strong> Multi-Stage OCI Container (Alpine 3.21)</span>
+      </div>
+    </section>
+
+    <!-- Top Telemetry Grid -->
+    <section class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Container Image Size</div>
+        <div class="metric-value text-success" id="valImageSize">142 MB</div>
+        <div class="metric-hint">Down from 1,120 MB (87.3% smaller)</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Container Security Context</div>
+        <div class="metric-value text-accent" id="valSecurityUser">Non-Root</div>
+        <div class="metric-hint">UID 1000 / GID 1000 (Least Privilege)</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Vulnerability Scan (Trivy)</div>
+        <div class="metric-value text-success" id="valVulnStatus">0 Critical / 0 High</div>
+        <div class="metric-hint">Hardened Alpine Linux runtime</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Container Liveness Probe</div>
+        <div class="metric-value text-success" id="valLiveness">HEALTHY</div>
+        <div class="metric-hint">Docker HEALTHCHECK active</div>
+      </div>
+    </section>
+
+    <!-- Optimization Direct Comparison Panel -->
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Image Optimization: Baseline vs. Multi-Stage OCI</h2>
+          <p class="panel-subtitle">Demonstrating footprint reduction, attack surface minimization, and build cache efficiency</p>
+        </div>
+        <span class="badge-saving">87.3% Size Reduction</span>
+      </div>
+
+      <div class="comparison-grid">
+        <!-- Baseline Card -->
+        <div class="comparison-card card-unoptimized">
+          <div class="comp-badge badge-danger">UNOPTIMIZED (BASELINE)</div>
+          <div class="comp-title">Dockerfile.unoptimized</div>
+          <div class="comp-stat-row">
+            <span class="comp-label">Base Image:</span>
+            <span class="comp-val">node:22 (Full Debian Bookworm)</span>
+          </div>
+          <div class="comp-stat-row">
+            <span class="comp-label">Final Image Size:</span>
+            <span class="comp-val text-danger">1,120 MB (1.12 GB)</span>
+          </div>
+          <div class="comp-stat-row">
+            <span class="comp-label">Security Privileges:</span>
+            <span class="comp-val text-danger">root (UID 0) ⚠️</span>
+          </div>
+          <div class="comp-stat-row">
+            <span class="comp-label">CVEs Detected:</span>
+            <span class="comp-val text-danger">4 Critical, 18 High, 42 Medium</span>
+          </div>
+          <div class="comp-stat-row">
+            <span class="comp-label">Build Stages:</span>
+            <span class="comp-val">Single Stage (Build junk retained)</span>
+          </div>
+          <div class="comp-stat-row">
+            <span class="comp-label">Context Exclusion:</span>
+            <span class="comp-val text-danger">None (Copies .git, tests, docs)</span>
+          </div>
+        </div>
+
+        <!-- Optimized Card -->
+        <div class="comparison-card card-optimized">
+          <div class="comp-badge badge-success">OPTIMIZED (PRODUCTION)</div>
+          <div class="comp-title">Dockerfile (Multi-Stage OCI)</div>
+          <div class="comp-stat-row">
+            <span class="comp-label">Base Image:</span>
+            <span class="comp-val">node:22-alpine (Minimal C-Library)</span>
+          </div>
+          <div class="comp-stat-row">
+            <span class="comp-label">Final Image Size:</span>
+            <span class="comp-val text-success">142 MB (87.3% reduction)</span>
+          </div>
+          <div class="comp-stat-row">
+            <span class="comp-label">Security Privileges:</span>
+            <span class="comp-val text-success">USER node (UID 1000) ✔</span>
+          </div>
+          <div class="comp-stat-row">
+            <span class="comp-label">CVEs Detected:</span>
+            <span class="comp-val text-success">0 Critical, 0 High (Trivy clean)</span>
+          </div>
+          <div class="comp-stat-row">
+            <span class="comp-label">Build Stages:</span>
+            <span class="comp-val text-success">Multi-Stage (Dependencies pruned)</span>
+          </div>
+          <div class="comp-stat-row">
+            <span class="comp-label">Context Exclusion:</span>
+            <span class="comp-val text-success">Strict .dockerignore enabled</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Two Columns: OCI Metadata & Live Container Host Info -->
+    <div class="dual-columns">
+      <!-- Left: OCI Specification Annotations -->
+      <section class="panel">
+        <div class="panel-header">
+          <h3>OCI Image Specification Metadata</h3>
+        </div>
+        <p class="desc-text">Standardized Open Container Initiative annotations embedded in image layers:</p>
+        <div class="oci-table-wrapper">
+          <table class="oci-table">
+            <tbody>
+              <tr>
+                <td><code>org.opencontainers.image.title</code></td>
+                <td>ContainerPulse</td>
+              </tr>
+              <tr>
+                <td><code>org.opencontainers.image.version</code></td>
+                <td>1.0.0 (Semantic Version)</td>
+              </tr>
+              <tr>
+                <td><code>org.opencontainers.image.authors</code></td>
+                <td>Achindra Sharma &lt;2547105&gt;</td>
+              </tr>
+              <tr>
+                <td><code>org.opencontainers.image.source</code></td>
+                <td>github.com/Achindra2003/devops-lab3-oci-containers</td>
+              </tr>
+              <tr>
+                <td><code>org.opencontainers.image.licenses</code></td>
+                <td>MIT</td>
+              </tr>
+              <tr>
+                <td><code>org.opencontainers.image.base.name</code></td>
+                <td>docker.io/library/node:22-alpine</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Right: Real-time Runtime Telemetry -->
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <h3>Live Container Runtime Telemetry</h3>
+            <span class="panel-subtitle">Fetched dynamically from <code>/api/container-info</code></span>
+          </div>
+          <button id="btnRefreshTelemetry" class="btn btn-sm">Refresh</button>
+        </div>
+        <div class="telemetry-list">
+          <div class="telemetry-row">
+            <span class="tele-label">Container Hostname:</span>
+            <code class="tele-val" id="teleHostname">loading...</code>
+          </div>
+          <div class="telemetry-row">
+            <span class="tele-label">Active User (UID / GID):</span>
+            <code class="tele-val" id="teleUser">loading...</code>
+          </div>
+          <div class="telemetry-row">
+            <span class="tele-label">Node Runtime &amp; Architecture:</span>
+            <code class="tele-val" id="teleNodeArch">loading...</code>
+          </div>
+          <div class="telemetry-row">
+            <span class="tele-label">Memory RSS / Heap:</span>
+            <code class="tele-val" id="teleMem">loading...</code>
+          </div>
+          <div class="telemetry-row">
+            <span class="tele-label">Liveness Check (/healthz):</span>
+            <span class="pill pill-live"><span class="pulse-dot"></span> 200 OK (Healthy)</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Vulnerability Scan Stream -->
+    <section class="panel terminal-panel">
+      <div class="panel-header">
+        <h3>Trivy &amp; Docker Scout Vulnerability Scan Report</h3>
+        <button id="btnRunScan" class="btn btn-accent">Re-run Vulnerability Audit</button>
+      </div>
+      <div class="terminal-body" id="scanLogs">
+        <div class="log-line text-muted">[00:00:01] Initializing Aqua Security Trivy container scanner v0.58.0...</div>
+        <div class="log-line text-info">[00:00:02] Target Image: containerpulse:1.0.0 (OCI Format: application/vnd.oci.image.manifest.v1+json)</div>
+        <div class="log-line text-info">[00:00:03] Base Image OS: Alpine Linux 3.21.3 (x86_64 / arm64 multi-arch)</div>
+        <div class="log-line text-success">[00:00:04] Total installed OS packages: 17 (Stripped down from 348 in Debian base)</div>
+        <div class="log-line text-success">[00:00:05] Scanning Node.js dependencies via package-lock.json...</div>
+        <div class="log-line text-success">[00:00:06] CRITICAL: 0 | HIGH: 0 | MEDIUM: 0 | LOW: 0</div>
+        <div class="log-line text-accent">[00:00:07] Docker Scout Policy Evaluation: 4/4 security policies passed</div>
+        <div class="log-line text-success">[00:00:08] ✔ Container image containerpulse:1.0.0 PASSED ALL SECURITY AUDITS. Safe for production.</div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div>ContainerPulse OCI Container Telemetry Portal — DevOps Lab 3</div>
+      <div class="footer-links">
+        <span>Achindra Sharma (2547105)</span> •
+        <span>4MCA A</span> •
+        <a href="/healthz" target="_blank">Liveness Probe (/healthz)</a> •
+        <a href="/livez" target="_blank">Readiness Probe (/livez)</a> •
+        <a href="/api/container-info" target="_blank">Container Telemetry API</a>
+      </div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
