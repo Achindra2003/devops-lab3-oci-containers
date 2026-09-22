@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# ContainerPulse Pre-Push Automated Test & Quality Guardrail
+# MCA Trimester 5 - DevOps Lab 3
+# Author: Achindra Sharma (2547105)
+
+echo "🚀 [pre-push] Running local validation test suite and container audit..."
+
+# Run automated tests
+npm test
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "❌ [pre-push ERROR] Local unit tests failed! Aborting git push."
+  exit 1
+fi
+
+# Run Dockerfile vulnerability and security audit
+npm run scan:vulnerabilities
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "❌ [pre-push ERROR] Container security benchmark failed! Aborting git push."
+  exit 1
+fi
+
+echo "✅ [pre-push] All unit tests and container audits passed. Proceeding with push."
+exit 0

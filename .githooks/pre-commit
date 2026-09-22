@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# ContainerPulse Pre-Commit Hook: Secrets, Conflict Markers & Container Audit
+# MCA Trimester 5 - DevOps Lab 3
+# Author: Achindra Sharma (2547105)
+
+echo "🔍 [pre-commit] Inspecting staged files for secrets and container hygiene..."
+
+# 1. Prevent committing raw .env files
+STAGED_ENV=$(git diff --cached --name-only | grep -E "(^|/)\.env($|\..+)" | grep -v "\.env\.example")
+if [ -n "$STAGED_ENV" ]; then
+  echo ""
+  echo "❌ [pre-commit ERROR] Attempting to commit forbidden environment secrets file:"
+  echo "$STAGED_ENV"
+  exit 1
+fi
+
+# 2. Prevent committing raw git conflict markers in application code
+CONFLICT_MARKERS=$(git diff --cached -U0 -- server.js Dockerfile public/ | grep -E "^(\+<{7} |\+={7}$|\+>{7} )" || true)
+if [ -n "$CONFLICT_MARKERS" ]; then
+  echo ""
+  echo "❌ [pre-commit ERROR] Unresolved merge conflict markers detected in staged files:"
+  echo "$CONFLICT_MARKERS"
+  exit 1
+fi
+
+# 3. Audit Dockerfile if staged
+STAGED_DOCKER=$(git diff --cached --name-only | grep -E "^Dockerfile$")
+if [ -n "$STAGED_DOCKER" ]; then
+  node scripts/scan-vulnerabilities.js >/dev/null 2>&1
+  if [ $? -ne 0 ]; then
+    echo "❌ [pre-commit ERROR] Dockerfile failed CIS Docker Benchmark audit."
+    exit 1
+  fi
+fi
+
+echo "✅ [pre-commit] Pre-commit security and container checks passed."
+exit 0
