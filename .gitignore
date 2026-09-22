@@ -1,0 +1,28 @@
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Build and container artifacts
+dist/
+build/
+*.tgz
+*.tar
+
+# Test and coverage
+coverage/
+.nyc_output/
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+npm-debug.log*

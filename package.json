@@ -1,0 +1,33 @@
+{
+  "name": "containerpulse-service",
+  "version": "1.0.0",
+  "description": "Cloud-Native OCI-Compliant Container Telemetry & Quality Watchdog Service",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test tests/server.test.js",
+    "lint": "node --check server.js",
+    "scan:vulnerabilities": "node scripts/scan-vulnerabilities.js",
+    "docker:build": "docker build -t containerpulse:1.0.0 .",
+    "docker:build:unoptimized": "docker build -f Dockerfile.unoptimized -t containerpulse:unoptimized .",
+    "docker:run": "docker run -d -p 3000:3000 --name containerpulse-app containerpulse:1.0.0",
+    "docker:scan": "docker scout cves containerpulse:1.0.0"
+  },
+  "keywords": [
+    "devops",
+    "docker",
+    "oci-containers",
+    "multi-stage-build",
+    "vulnerability-scanning",
+    "trivy",
+    "docker-scout",
+    "container-hardening"
+  ],
+  "author": "Achindra Sharma <2547105>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

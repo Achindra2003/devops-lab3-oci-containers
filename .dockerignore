@@ -1,0 +1,36 @@
+# Ignore dependencies and build artifacts
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist
+build
+coverage
+.nyc_output
+
+# Ignore git and VCS
+.git
+.gitignore
+.githooks
+
+# Ignore CI/CD and repository governance
+.github
+.gitlab-ci.yml
+
+# Ignore documentation and reports (reduces image build context)
+docs
+*.md
+*.pdf
+*.html
+
+# Ignore environment secrets
+.env*
+*.pem
+*.key
+
+# Ignore OS and editor metadata
+.DS_Store
+Thumbs.db
+.vscode
+.idea
+*.swp
