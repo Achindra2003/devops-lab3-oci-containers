@@ -1,0 +1,23 @@
+# =========================================================================
+# ANTI-PATTERN BASELINE: Unoptimized, Fat, Insecure Dockerfile
+# Used in Lab 3 for direct contrast and empirical optimization benchmarking
+# =========================================================================
+
+# Anti-Pattern 1: Full bloated Debian-based base image (~1.12 GB)
+FROM node:22
+
+# Anti-Pattern 2: Defaulting to root user (UID 0) - severe security hazard
+# No non-root USER instruction provided
+
+# Anti-Pattern 3: Inefficient layer caching (source code copied before package.json)
+# Any change to server.js busts the npm install cache layer
+WORKDIR /app
+COPY . .
+
+# Anti-Pattern 4: Installing full dev dependencies into the final image
+RUN npm install
+
+# Anti-Pattern 5: No HEALTHCHECK directive declared
+EXPOSE 3000
+
+CMD ["node", "server.js"]
