@@ -15,7 +15,8 @@ WORKDIR /build
 COPY package*.json ./
 
 # Install only production dependencies without generating cache bloat
-RUN npm ci --omit=dev --ignore-scripts && \
+RUN mkdir -p /build/node_modules && \
+    npm ci --omit=dev --ignore-scripts && \
     npm cache clean --force
 
 # -------------------------------------------------------------------------
