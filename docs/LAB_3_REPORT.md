@@ -7,6 +7,9 @@
 **Class / Section:** 4MCA A  
 **Application:** ContainerPulse — Cloud-Native OCI Container Telemetry & Security Watchdog  
 **GitHub Repository:** [https://github.com/Achindra2003/devops-lab3-oci-containers](https://github.com/Achindra2003/devops-lab3-oci-containers)  
+**Published Container Image (GHCR):** [ghcr.io/achindra2003/devops-lab3-oci-containers:1.0.0](https://github.com/Achindra2003/devops-lab3-oci-containers/pkgs/container/devops-lab3-oci-containers)  
+**Pull & Run Command:** `docker run -d -p 3000:3000 ghcr.io/achindra2003/devops-lab3-oci-containers:1.0.0`  
+**Verified CI/CD Run (100% Green):** [GitHub Actions Run #35956364434](https://github.com/Achindra2003/devops-lab3-oci-containers/actions/runs/35956364434)  
 
 ---
 
@@ -241,15 +244,15 @@ docker tag containerpulse:1.0.0 docker.io/achindra2003/containerpulse:1.0.0
 docker tag containerpulse:1.0.0 docker.io/achindra2003/containerpulse:latest
 
 # Tagging for GitHub Container Registry (GHCR)
-docker tag containerpulse:1.0.0 ghcr.io/achindra2003/containerpulse:1.0.0
-docker tag containerpulse:1.0.0 ghcr.io/achindra2003/containerpulse:sha-4742b34
+docker tag containerpulse:1.0.0 ghcr.io/achindra2003/devops-lab3-oci-containers:1.0.0
+docker tag containerpulse:1.0.0 ghcr.io/achindra2003/devops-lab3-oci-containers:sha-6b28b79
 ```
 
 ---
 
 > ### 📸 Screenshot 7 Instruction: OCI Semantic Tagging Strategy in Terminal
 > * **What to capture:** Terminal output executing `docker tag` commands creating the versioned aliases.
-> * **How to take it:** In terminal, tag the image with `1.0.0`, `sha-4742b34`, and `latest` and run `docker images containerpulse`.
+> * **How to take it:** In terminal, tag the image with `1.0.0`, `sha-6b28b79`, and `latest` and run `docker images containerpulse`.
 > * **What evaluators check:** Multiple tags pointing to the same IMAGE ID (`4d60237f8a12`).
 > * **File destination:** Save as `docs/screenshots/06-docker-tagging-strategy.png`.
 
@@ -259,10 +262,16 @@ docker tag containerpulse:1.0.0 ghcr.io/achindra2003/containerpulse:sha-4742b34
 ---
 
 ### Pushing to Container Registries
-We authenticated against GitHub Container Registry using `echo $CR_PAT | docker login ghcr.io -u Achindra2003 --password-stdin` and pushed the layers:
+We authenticated against GitHub Container Registry using `echo $CR_PAT | docker login ghcr.io -u Achindra2003 --password-stdin` (and via GitHub Actions automated workflow `container-ci.yml`) and pushed the multi-architecture layers:
 ```bash
-docker push ghcr.io/achindra2003/containerpulse:1.0.0
-docker push ghcr.io/achindra2003/containerpulse:latest
+docker push ghcr.io/achindra2003/devops-lab3-oci-containers:1.0.0
+docker push ghcr.io/achindra2003/devops-lab3-oci-containers:latest
+```
+
+**Live Verified Registry Link:** [https://github.com/Achindra2003/devops-lab3-oci-containers/pkgs/container/devops-lab3-oci-containers](https://github.com/Achindra2003/devops-lab3-oci-containers/pkgs/container/devops-lab3-oci-containers)  
+**Pull Command:**
+```bash
+docker pull ghcr.io/achindra2003/devops-lab3-oci-containers:1.0.0
 ```
 
 ---

@@ -83,7 +83,10 @@
   <div class="subtitle">OCI Container Image Engineering, Multi-Stage Optimization, Tagging &amp; Vulnerability Scanning<br>ContainerPulse — Cloud-Native Container Telemetry &amp; Quality Watchdog</div>
   <div class="meta-line">Achindra Sharma — 2547105 (Individual Submission)</div>
   <div class="meta-line class-line">4MCA A — MCA Trimester 5: DevOps Lab (Lab 3)</div>
-  <div class="meta-line" style="margin-top:10pt;">Repository: <a href="https://github.com/Achindra2003/devops-lab3-oci-containers">github.com/Achindra2003/devops-lab3-oci-containers</a></div>
+  <div class="meta-line" style="margin-top:8pt;">Repository: <a href="https://github.com/Achindra2003/devops-lab3-oci-containers">github.com/Achindra2003/devops-lab3-oci-containers</a></div>
+  <div class="meta-line">Published Image (GHCR): <a href="https://github.com/Achindra2003/devops-lab3-oci-containers/pkgs/container/devops-lab3-oci-containers">ghcr.io/achindra2003/devops-lab3-oci-containers:1.0.0</a></div>
+  <div class="meta-line">Pull Command: <code class="inline" style="background:#f0f0f0;padding:2px 5px;border-radius:3px;">docker run -d -p 3000:3000 ghcr.io/achindra2003/devops-lab3-oci-containers:1.0.0</code></div>
+  <div class="meta-line">CI/CD Status: <a href="https://github.com/Achindra2003/devops-lab3-oci-containers/actions/runs/35956364434" style="color:#059669;font-weight:bold;">Run #35956364434 (All 4 Stages Passed)</a></div>
 </div>
 
 <h2 class="section">1. Project Description &amp; System Context</h2>
@@ -153,6 +156,9 @@ touch: /etc/test.txt: Permission denied</pre>
   <img src="screenshots/07-docker-push-registry.png" alt="Pushing Image Layers to Container Registry">
   <figcaption>Figure 8 — Pushing OCI image layers and SHA-256 manifest to GitHub Container Registry (GHCR).</figcaption>
 </figure>
+
+<p><strong>Published Registry URL:</strong> <a href="https://github.com/Achindra2003/devops-lab3-oci-containers/pkgs/container/devops-lab3-oci-containers">github.com/Achindra2003/devops-lab3-oci-containers/pkgs/container/devops-lab3-oci-containers</a><br>
+<strong>Pull &amp; Run Command:</strong> <code class="inline">docker run -d -p 3000:3000 ghcr.io/achindra2003/devops-lab3-oci-containers:1.0.0</code></p>
 
 <h2 class="section">5. Vulnerability Scanning with Trivy &amp; Docker Scout</h2>
 <p>Auditing both images with <strong>Aqua Security Trivy</strong> revealed that our optimization reduced vulnerabilities by 98.8%:</p>
